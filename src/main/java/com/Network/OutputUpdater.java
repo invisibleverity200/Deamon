@@ -1,4 +1,8 @@
 package com.Network;
 
-public class OutputUpdater {
+public class OutputUpdater implements Runnable {
+    @Override
+    public void run() {
+
+    }
 }
