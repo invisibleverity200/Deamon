@@ -1,5 +1,7 @@
 package com.UI;
 
+import com.Network.Client;
+import com.Network.DaemonClient;
 import com.Objects.Config;
 import com.Objects.Configs;
 import com.Objects.Discrete;
@@ -13,6 +15,7 @@ public class GUI extends JFrame {
     int nameType = 1;
 
     public GUI() {
+        Client daemonClient = new DaemonClient();
         final JButton[][] buttonsUpLink = {null};
         final JButton[][] buttonsDownLink = {null};
         Configs config = new Config();
@@ -74,6 +77,7 @@ public class GUI extends JFrame {
         int index = 0;
         for (Discrete discrete : discretes) {
             buttons[index] = new JButton(discrete.getAttributes()[nameType].substring(1, discrete.getAttributes()[nameType].length() - 1));
+            buttons[index].setBackground(Color.ORANGE);
             buttons[index].addActionListener((ActionEvent e) -> {
                 System.out.println("test");
                 //TODO write methode

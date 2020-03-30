@@ -1,7 +1,5 @@
 package com.Objects;
 
-import java.util.ArrayList;
-
 public class Discrete {
     private String[] attributes;
 
