@@ -3,9 +3,9 @@ package com.Objects;
 import java.util.ArrayList;
 
 public interface Configs {
-    ArrayList<String[]> getUpLinkChannels();
+    ArrayList<Discrete> getUpLinkChannels();
 
     void updateConfig();
 
-    ArrayList<String[]> getDownLinkChannels();
+    ArrayList<Discrete> getDownLinkChannels();
 }

@@ -1,24 +1,27 @@
 package com.Objects;
 
 
+import com.Utils.MySortAlgorithim;
+import com.Utils.SortAlgorithim;
+
 import javax.json.*;
 import javax.json.stream.JsonParsingException;
 import java.io.*;
 import java.util.ArrayList;
 
 public class Config implements Configs {
-    private ArrayList<String[]> upLinkChannels = new ArrayList<>();
-    private ArrayList<String[]> downLinkChannels = new ArrayList<>();
+    private ArrayList<Discrete> upLinkChannels = new ArrayList<>(); //Discrete
+    private ArrayList<Discrete> downLinkChannels = new ArrayList<>();
 
     public Config() {
         readConfigFile();
     }
 
-    public ArrayList<String[]> getUpLinkChannels() {
+    public ArrayList<Discrete> getUpLinkChannels() {
         return upLinkChannels;
     }
 
-    public ArrayList<String[]> getDownLinkChannels() {
+    public ArrayList<Discrete> getDownLinkChannels() {
         return downLinkChannels;
     }
 
@@ -57,17 +60,19 @@ public class Config implements Configs {
         }
     }
 
-    private void fillArray(ArrayList<String[]> arrayList, JsonArray channels) {
+    private void fillArray(ArrayList<Discrete> arrayList, JsonArray channels) {
+        SortAlgorithim algorithim = new MySortAlgorithim();
         for (JsonValue channel : channels) {
             JsonArray temp = channel.asJsonArray();
             int index = 0;
-            String[] channelAttributes = new String[4];//FIXME possible bug
+            String[] channelAttributes = new String[4];
             for (JsonValue channelAttribute : temp) {
                 channelAttributes[index] = channelAttribute.toString();
                 index++;
             }
-            arrayList.add(channelAttributes);
+            arrayList.add(new Discrete(channelAttributes));
         }
+        arrayList = algorithim.sort(arrayList);
     }
 
     private void close(InputStream inputStream, InputStream inputStream2, JsonReader jsonReader, JsonReader jsonReader2) throws IOException {
