@@ -11,6 +11,8 @@ import java.util.ArrayList;
 public class Config implements Configs {
     private ArrayList<Discrete> upLinkChannels = new ArrayList<>(); //Discrete
     private ArrayList<Discrete> downLinkChannels = new ArrayList<>();
+    private int[] upLinkPosArray;
+    private int[] downLinkPosArray;
 
     public Config() {
         readConfigFile();
@@ -22,6 +24,14 @@ public class Config implements Configs {
 
     public ArrayList<Discrete> getDownLinkChannels() {
         return downLinkChannels;
+    }
+
+    public int[] getUpLinkPosArray() {
+        return upLinkPosArray;
+    }
+
+    public int[] getDownLinkPosArray() {
+        return downLinkPosArray;
     }
 
     public void updateConfig() {
@@ -45,8 +55,8 @@ public class Config implements Configs {
             JsonArray downLinkChannels = config.getJsonArray("DownlinkChannels");
 
 
-            fillArray(this.upLinkChannels, upLinkChannels);
-            fillArray(this.downLinkChannels, downLinkChannels);
+            fillArray(this.upLinkChannels, upLinkChannels, upLinkPosArray);
+            fillArray(this.downLinkChannels, downLinkChannels, downLinkPosArray);
 
         } catch (FileNotFoundException | JsonParsingException | NumberFormatException | NullPointerException e) {
             e.printStackTrace();
@@ -59,7 +69,8 @@ public class Config implements Configs {
         }
     }
 
-    private void fillArray(ArrayList<Discrete> arrayList, JsonArray channels) {
+    private void fillArray(ArrayList<Discrete> arrayList, JsonArray channels, int[] posArray) {
+        boolean tempFlag = false;
         SortAlgorithim algorithim = new MySortAlgorithim();
         for (JsonValue channel : channels) {
             JsonArray temp = channel.asJsonArray();
@@ -71,7 +82,20 @@ public class Config implements Configs {
             }
             arrayList.add(new Discrete(channelAttributes));
         }
+
         arrayList = algorithim.sort(arrayList);
+        posArray = new int[arrayList.get(arrayList.size() - 1).getDiscreteIdx()];
+        for (int indexPosArray = 0; indexPosArray < posArray.length; indexPosArray++) {
+            for (int index = 0; index < arrayList.size(); index++) {
+                if (index == arrayList.get(index).getDiscreteIdx()) {
+                    posArray[indexPosArray] = index;
+                    tempFlag = true;
+                }
+            }
+            if (!tempFlag) {
+                posArray[indexPosArray] = -1;
+            }
+        }
     }
 
     private void close(InputStream inputStream, InputStream inputStream2, JsonReader jsonReader, JsonReader jsonReader2) throws IOException {

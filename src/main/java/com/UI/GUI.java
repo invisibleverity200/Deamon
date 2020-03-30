@@ -12,13 +12,22 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 public class GUI extends JFrame {
-    int nameType = 1;
+    private int nameType = 1;
+    private Configs config;
+    private Client daemonClient;
 
     public GUI() {
-        Client daemonClient = new DaemonClient();
+        config = new Config();
         final JButton[][] buttonsUpLink = {null};
         final JButton[][] buttonsDownLink = {null};
-        Configs config = new Config();
+
+        buttonsUpLink[0] = getUpLinkButtons(config.getUpLinkChannels());
+        buttonsDownLink[0] = getUpLinkButtons(config.getDownLinkChannels());
+
+        daemonClient = new DaemonClient(buttonsUpLink[0], buttonsDownLink[0], config);
+        if(!daemonClient.init()){
+            //TODO show error message!!!
+        }
 
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new GridLayout(0, 10));
@@ -34,7 +43,7 @@ public class GUI extends JFrame {
 
         upLinkWindow.addActionListener((ActionEvent e) -> {
             if (buttonsUpLink[0] == null) {
-                buttonsUpLink[0] = getButtons(config.getUpLinkChannels());
+                buttonsUpLink[0] = getUpLinkButtons(config.getUpLinkChannels());
                 setUpContentPane(buttonsUpLink[0], contentPanel);
             } else {
                 setUpContentPane(buttonsUpLink[0], contentPanel);
@@ -43,7 +52,7 @@ public class GUI extends JFrame {
         });
         downLinkWindow.addActionListener((ActionEvent e) -> {
             if (buttonsDownLink[0] == null) {
-                buttonsDownLink[0] = getButtons(config.getDownLinkChannels());
+                buttonsDownLink[0] = getDownLinkButtons(config.getDownLinkChannels());
                 setUpContentPane(buttonsDownLink[0], contentPanel);
             } else {
                 setUpContentPane(buttonsDownLink[0], contentPanel);
@@ -54,7 +63,7 @@ public class GUI extends JFrame {
         channelNameTypes.add(upLinkWindow);
         channelNameTypes.add(downLinkWindow);
 
-        setUpContentPane(getButtons(config.getUpLinkChannels()), contentPanel);
+        setUpContentPane(buttonsDownLink[0], contentPanel);
 
         setContentPane(contentPanel);
 
@@ -72,16 +81,51 @@ public class GUI extends JFrame {
 
     }
 
-    private JButton[] getButtons(ArrayList<Discrete> discretes) {
+    private JButton[] getUpLinkButtons(ArrayList<Discrete> discretes) {
+        int i = 0;
         JButton[] buttons = new JButton[discretes.size()];
         int index = 0;
         for (Discrete discrete : discretes) {
             buttons[index] = new JButton(discrete.getAttributes()[nameType].substring(1, discrete.getAttributes()[nameType].length() - 1));
             buttons[index].setBackground(Color.ORANGE);
+            int finalI = i;
             buttons[index].addActionListener((ActionEvent e) -> {
-                System.out.println("test");
+                int x = finalI;
+                if (config.getUpLinkChannels().get(x).getFlag()) {
+                    config.getUpLinkChannels().get(x).setFlag(false);
+                } else {
+                    config.getUpLinkChannels().get(x).setFlag(true);
+                }
+                Discrete thisButton = config.getUpLinkChannels().get(x);
+                daemonClient.sendDiscrete(thisButton);
+            });
+            i++;
+            index++;
+        }
+
+        return buttons;
+    }
+
+    private JButton[] getDownLinkButtons(ArrayList<Discrete> discretes) {
+        int i = 0;
+        JButton[] buttons = new JButton[discretes.size()];
+        int index = 0;
+        for (Discrete discrete : discretes) {
+            buttons[index] = new JButton(discrete.getAttributes()[nameType].substring(1, discrete.getAttributes()[nameType].length() - 1));
+            buttons[index].setBackground(Color.ORANGE);
+            int finalI = i;
+            buttons[index].addActionListener((ActionEvent e) -> {
+                int x = finalI;
+                if (config.getDownLinkChannels().get(x).getFlag()) {
+                    config.getDownLinkChannels().get(x).setFlag(false);
+                } else {
+                    config.getDownLinkChannels().get(x).setFlag(true);
+                }
+                Discrete thisButton = config.getDownLinkChannels().get(x);
+                System.out.println(x);
                 //TODO write methode
             });
+            i++;
             index++;
         }
 

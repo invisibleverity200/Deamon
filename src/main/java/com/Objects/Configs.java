@@ -8,4 +8,6 @@ public interface Configs {
     void updateConfig();
 
     ArrayList<Discrete> getDownLinkChannels();
+     int[] getDownLinkPosArray();
+     int[] getUpLinkPosArray();
 }
