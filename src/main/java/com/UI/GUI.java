@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GUI extends JFrame {
     private int nameType = 1;
@@ -22,6 +23,7 @@ public class GUI extends JFrame {
         config = new Config();
         final JButton[][] buttonsUpLink = {null};
         final JButton[][] buttonsDownLink = {null};
+        AtomicInteger currentSide = new AtomicInteger();
 
         buttonsUpLink[0] = getUpLinkButtons(config.getUpLinkChannels());
         buttonsDownLink[0] = getUpLinkButtons(config.getDownLinkChannels());
@@ -39,6 +41,7 @@ public class GUI extends JFrame {
         JMenuItem downLinkWindow = new JMenuItem("Down Link");
 
         upLinkWindow.addActionListener((ActionEvent e) -> {
+            currentSide.set(0);
             if (buttonsUpLink[0] == null) {
                 buttonsUpLink[0] = getUpLinkButtons(config.getUpLinkChannels());
                 setUpContentPane(buttonsUpLink[0], contentPanel);
@@ -47,6 +50,7 @@ public class GUI extends JFrame {
             }
         });
         downLinkWindow.addActionListener((ActionEvent e) -> {
+            currentSide.set(1);
             if (buttonsDownLink[0] == null) {
                 buttonsDownLink[0] = getDownLinkButtons(config.getDownLinkChannels());
                 setUpContentPane(buttonsDownLink[0], contentPanel);
@@ -56,6 +60,20 @@ public class GUI extends JFrame {
         });
 
         JMenu operations = new JMenu("Operations");
+        JMenu nameSets = new JMenu("Name Sets");
+
+        JMenuItem nameSet1 = new JMenuItem("Name set 1");
+        nameSet1.addActionListener((ActionEvent e) -> {
+            changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 0, currentSide.get());
+        });
+        JMenuItem nameSet2 = new JMenuItem("Name set 2");
+        nameSet2.addActionListener((ActionEvent e) -> {
+            changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 1, currentSide.get());
+        });
+        JMenuItem nameSet3 = new JMenuItem("Name set 3");
+        nameSet3.addActionListener((ActionEvent e) -> {
+            changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 2, currentSide.get());
+        });
 
         JMenuItem quit = new JMenuItem("Quit");
         quit.addActionListener((ActionEvent e) -> {
@@ -64,18 +82,21 @@ public class GUI extends JFrame {
             System.exit(1);
         });
 
+        nameSets.add(nameSet1);
+        nameSets.add(nameSet2);
+        nameSets.add(nameSet3);
+
         operations.add(quit);
 
         JLabel statusLabel = new JLabel("       Not Connected");
         statusLabel.setForeground(Color.red);
 
         menuBar.add(operations);
+        menuBar.add(nameSets);
         menuBar.add(statusLabel);
 
         channelNameTypes.add(upLinkWindow);
         channelNameTypes.add(downLinkWindow);
-
-        setUpContentPane(buttonsUpLink[0], contentPanel);
 
         setContentPane(contentPanel);
 
@@ -88,6 +109,8 @@ public class GUI extends JFrame {
         setVisible(true);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        setUpContentPane(buttonsUpLink[0], contentPanel);
 
         while (createClient(buttonsUpLink, buttonsDownLink, true, statusLabel)) ;
 
@@ -134,6 +157,11 @@ public class GUI extends JFrame {
                     config.getUpLinkChannels().get(x).setFlag(true);
                 }
                 Discrete thisButton = config.getUpLinkChannels().get(x);
+                if (thisButton.getFlag()) {
+                    thisButton.setFlag(false);
+                } else {
+                    thisButton.setFlag(true);
+                }
                 daemonClient.sendDiscrete(thisButton);
             });
             i++;
@@ -159,8 +187,12 @@ public class GUI extends JFrame {
                     config.getDownLinkChannels().get(x).setFlag(true);
                 }
                 Discrete thisButton = config.getDownLinkChannels().get(x);
-                System.out.println(x);
-                //TODO write methode
+                if (thisButton.getFlag()) {
+                    thisButton.setFlag(false);
+                } else {
+                    thisButton.setFlag(true);
+                }
+                daemonClient.sendDiscrete(thisButton);
             });
             i++;
             index++;
@@ -187,5 +219,17 @@ public class GUI extends JFrame {
         revalidate();
         pack();
         repaint();
+    }
+
+    private void changeNameSet(JButton[] buttons, int nameSetId, int sideIdx) {
+        if (sideIdx == 0) {
+            for (int index = 0; index < buttons.length; index++) {
+                buttons[index].setText(config.getUpLinkChannels().get(index).getAttributes()[nameSetId + 1].substring(1, config.getUpLinkChannels().get(index).getAttributes()[nameSetId + 1].length() - 1));
+            }
+        } else {
+            for (int index = 0; index < buttons.length; index++) {
+                buttons[index].setText(config.getDownLinkChannels().get(index).getAttributes()[nameSetId + 1].substring(1, config.getDownLinkChannels().get(index).getAttributes()[nameSetId + 1].length() - 1));
+            }
+        }
     }
 }

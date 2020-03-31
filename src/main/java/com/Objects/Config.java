@@ -84,6 +84,9 @@ public class Config implements Configs {
         }
 
         arrayList = algorithim.sort(arrayList);
+        for (int i = 0; i < arrayList.size(); i++) {
+            System.out.println("discrete IDX at: " + (i + 1) + "  " + arrayList.get(i).getDiscreteIdx());
+        }
         posArray = new int[arrayList.get(arrayList.size() - 1).getDiscreteIdx()];
         for (int indexPosArray = 0; indexPosArray < posArray.length; indexPosArray++) {
             for (int index = 0; index < arrayList.size(); index++) {
