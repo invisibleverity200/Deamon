@@ -5,6 +5,7 @@ import com.Objects.Configs;
 import com.Objects.Discrete;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 
 public class DaemonClient implements Client {
@@ -20,10 +21,17 @@ public class DaemonClient implements Client {
 
 
     //[inOrOut,idx,flag]
-    public DaemonClient(JButton[] upLinkButtons, JButton[] downLinkButtons, Configs config) {
+    public DaemonClient(JButton[] upLinkButtons, JButton[] downLinkButtons, Configs config, JLabel statusLabel) throws IOException {
         this.upLinkButtons = upLinkButtons;
         this.downLinkButtons = downLinkButtons;
         this.config = config;
+
+        receiveSocket = new ReceiveSocket(IP_ADDR, RECEIVE_PORT);
+        sendSocket = new SendSocket(IP_ADDR, SEND_PORT);
+
+        statusLabel.setText("Connected");
+        statusLabel.setForeground(Color.GREEN);
+
     }
 
     @Override
@@ -39,17 +47,6 @@ public class DaemonClient implements Client {
         }
     }
 
-    public boolean init() {
-        try {
-            receiveSocket = new ReceiveSocket(IP_ADDR, RECEIVE_PORT);
-            sendSocket = new SendSocket(IP_ADDR, SEND_PORT);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
     public boolean sendDiscrete(Discrete discrete) {
         sendSocket.send(discrete);
         return true;
@@ -57,8 +54,8 @@ public class DaemonClient implements Client {
 
     public void closeConnections() {
         try {
-            sendSocket.closeConnection();
-            receiveSocket.closeConnection();
+            if (sendSocket != null) sendSocket.closeConnection();
+            if (sendSocket != null) receiveSocket.closeConnection();
         } catch (IOException e) {
             e.printStackTrace();
         }
