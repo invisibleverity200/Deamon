@@ -63,17 +63,13 @@ public class GUI extends JFrame {
         JMenu nameSets = new JMenu("Name Sets");
 
         JMenuItem nameSet1 = new JMenuItem("Name set 1");
-        nameSet1.addActionListener((ActionEvent e) -> {
-            changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 0, currentSide.get());
-        });
+        nameSet1.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 0, currentSide.get()));
+
         JMenuItem nameSet2 = new JMenuItem("Name set 2");
-        nameSet2.addActionListener((ActionEvent e) -> {
-            changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 1, currentSide.get());
-        });
+        nameSet2.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 1, currentSide.get()));
+
         JMenuItem nameSet3 = new JMenuItem("Name set 3");
-        nameSet3.addActionListener((ActionEvent e) -> {
-            changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 2, currentSide.get());
-        });
+        nameSet3.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 2, currentSide.get()));
 
         JMenuItem quit = new JMenuItem("Quit");
         quit.addActionListener((ActionEvent e) -> {
@@ -91,8 +87,8 @@ public class GUI extends JFrame {
         JLabel statusLabel = new JLabel("       Not Connected");
         statusLabel.setForeground(Color.red);
 
-        menuBar.add(operations);
         menuBar.add(nameSets);
+        menuBar.add(operations);
         menuBar.add(statusLabel);
 
         channelNameTypes.add(upLinkWindow);
@@ -108,9 +104,16 @@ public class GUI extends JFrame {
 
         setVisible(true);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
         setUpContentPane(buttonsUpLink[0], contentPanel);
+
+        if (buttonsUpLink.length * 300 >= 650) {
+            setSize(buttonsUpLink.length * 300, buttonsUpLink.length / 10 * 20 + 100);
+        } else {
+            setSize(650, buttonsUpLink.length / 10 * 20 + 100);
+            System.out.println("not enought button\n");
+        }
+
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         while (createClient(buttonsUpLink, buttonsDownLink, true, statusLabel)) ;
 
@@ -214,7 +217,8 @@ public class GUI extends JFrame {
         if (buttons.length * 300 >= 650) {
             setSize(buttons.length * 300, buttons.length / 10 * 20 + 100);
         } else {
-            setSize(650, buttons.length / 10 * 20 + 100);
+            setSize(650, buttons.length / 10 * 20 + 100); //FIXME setSize is not working correctly!
+            System.out.println("not enought button\n");
         }
         revalidate();
         pack();

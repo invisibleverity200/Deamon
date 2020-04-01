@@ -31,6 +31,6 @@ public class Discrete {
         //disc_idx = card * NUM_ASTS2SUT_PORTS * PORTSIZE +
         //	  port * PORTSIZE + bit_no;
         int card_bitidx = Integer.parseInt("" + attributes[0].charAt(3) + attributes[0].charAt(4), 16);
-        return (attributes[0].charAt(1) - '0') * NUM_ASTS2SUT_PORTS * PORTSIZE + (attributes[0].charAt(2) - 'A') * PORTSIZE + card_bitidx;
+        return (attributes[0].charAt(1) - '0') * NUM_ASTS2SUT_PORTS * PORTSIZE + (attributes[0].charAt(2) - 'A') * PORTSIZE + card_bitidx;//TODO find true value of the const variables!!!
     }
 }//0B0C
