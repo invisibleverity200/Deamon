@@ -18,18 +18,20 @@ public class SendSocket extends Socket {
 
         this.ipAddr = ipAddr;
         this.port = port;
+
+        init();
     }
 
     void send(Discrete discrete) {
         try {
-            outputStream.writeInt(discrete.getDiscreteIdx());
+            outputStream.writeInt(discrete.getDiscreteIdx());// there is the possibility that u need to send the Id(0A0C)
             outputStream.writeBoolean(discrete.getFlag());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    boolean init() throws IOException {
+    private boolean init() throws IOException {
         try {
             outputStream = new DataOutputStream(this.getOutputStream());
             dataInputStream = new DataInputStream(this.getInputStream());
@@ -40,6 +42,7 @@ public class SendSocket extends Socket {
         }
         return true;
     }
+
     public void closeConnection() throws IOException {
         if (this != null) this.close();
         if (outputStream != null) outputStream.close();

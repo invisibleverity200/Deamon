@@ -100,18 +100,11 @@ public class GUI extends JFrame {
 
         pack();
 
-        setTitle("DeamonGUI");
+        setTitle("DaemonGUI");
 
         setVisible(true);
 
         setUpContentPane(buttonsUpLink[0], contentPanel);
-
-        if (buttonsUpLink.length * 300 >= 650) {
-            setSize(buttonsUpLink.length * 300, buttonsUpLink.length / 10 * 20 + 100);
-        } else {
-            setSize(650, buttonsUpLink.length / 10 * 20 + 100);
-            System.out.println("not enought button\n");
-        }
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -133,7 +126,7 @@ public class GUI extends JFrame {
                 System.exit(1);
             }
         }
-        if (!failed) {
+        if (!failed) {//FIXME possible bug!!!
             clientThread = new Thread(daemonClient);
             clientThread.start();
             JOptionPane.showMessageDialog(null,
@@ -151,6 +144,7 @@ public class GUI extends JFrame {
         for (Discrete discrete : discretes) {
             buttons[index] = new JButton(discrete.getAttributes()[nameType].substring(1, discrete.getAttributes()[nameType].length() - 1));
             buttons[index].setBackground(Color.ORANGE);
+            buttons[index].setPreferredSize(new Dimension(150, 40));
             int finalI = i;
             buttons[index].addActionListener((ActionEvent e) -> {
                 int x = finalI;
@@ -215,10 +209,9 @@ public class GUI extends JFrame {
             contentPane.add(button);
         }
         if (buttons.length * 300 >= 650) {
-            setSize(buttons.length * 300, buttons.length / 10 * 20 + 100);
+            setSize(buttons.length * 150, buttons.length / 10 * 20 + 100);
         } else {
-            setSize(650, buttons.length / 10 * 20 + 100); //FIXME setSize is not working correctly!
-            System.out.println("not enought button\n");
+            setSize(650, buttons.length / 10 * 20 + 100);
         }
         revalidate();
         pack();

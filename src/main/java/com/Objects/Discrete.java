@@ -4,8 +4,8 @@ public class Discrete {
     private String[] attributes;
     private boolean flag;
 
-    private final int NUM_ASTS2SUT_PORTS = 1;
-    private final int PORTSIZE = 1;
+    private static int NUM_ASTS2SUT_PORTS = 1;
+    private static int PORTSIZE = 1;
 
     public boolean getFlag() {
         return flag;

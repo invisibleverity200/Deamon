@@ -22,9 +22,11 @@ public class ReceiveSocket extends Socket {
 
         this.ipAddr = ipAddr;
         this.port = port;
+
+        init();
     }
 
-    boolean init() throws IOException {
+    private boolean init() throws IOException {
         try {
             outputStream = new DataOutputStream(this.getOutputStream());
             dataInputStream = new DataInputStream(this.getInputStream());
