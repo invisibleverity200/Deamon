@@ -11,8 +11,7 @@ import java.util.ArrayList;
 public class Config implements Configs {
     private ArrayList<Discrete> astsToCidsChannels = new ArrayList<>(); //Discrete
     private ArrayList<Discrete> cidsToAstsChannels = new ArrayList<>();
-    private int[] astsToCidsArray;
-    private int[] cidsToAstsArray;
+    private int[][] posArrays = new int[2][];
 
     public Config() {
         readConfigFile();
@@ -27,11 +26,11 @@ public class Config implements Configs {
     }
 
     public int[] getAstsToCidsArray() {
-        return astsToCidsArray;
+        return posArrays[0];
     }
 
     public int[] getCidsToAstsArray() {
-        return cidsToAstsArray;
+        return posArrays[1];
     }
 
     public void updateConfig() {
@@ -51,12 +50,14 @@ public class Config implements Configs {
 
             JsonObject config = reader.readObject();
 
-            JsonArray upLinkChannels = config.getJsonArray("UplinkChannels");
-            JsonArray downLinkChannels = config.getJsonArray("DownlinkChannels");
+            JsonArray astsToCidsChannels = config.getJsonArray("UplinkChannels");
+            JsonArray cidsToAstsChannels = config.getJsonArray("DownlinkChannels");
 
 
-            fillArray(this.astsToCidsChannels, upLinkChannels, astsToCidsArray);
-            fillArray(this.cidsToAstsChannels, downLinkChannels, cidsToAstsArray);
+            fillArray(this.astsToCidsChannels, astsToCidsChannels, 0);
+            fillArray(this.cidsToAstsChannels, cidsToAstsChannels, 1);
+            System.out.println(posArrays[0].length);
+            System.out.println(posArrays[1].length);
 
         } catch (FileNotFoundException | JsonParsingException | NumberFormatException | NullPointerException e) {
             e.printStackTrace();
@@ -69,8 +70,7 @@ public class Config implements Configs {
         }
     }
 
-    private void fillArray(ArrayList<Discrete> arrayList, JsonArray channels, int[] posArray) {//FIXME something is wrong here
-        boolean tempFlag = false;
+    private void fillArray(ArrayList<Discrete> arrayList, JsonArray channels, int sideIdx) {//FIXME something is wrong here
         SortAlgorithim algorithim = new MySortAlgorithim();
         for (JsonValue channel : channels) {
             JsonArray temp = channel.asJsonArray();
@@ -87,16 +87,23 @@ public class Config implements Configs {
         for (int i = 0; i < arrayList.size(); i++) {
             System.out.println("discrete IDX at: " + (i + 1) + "  " + arrayList.get(i).getDiscreteIdx());
         }
-        posArray = new int[arrayList.get(arrayList.size() - 1).getDiscreteIdx()];
-        for (int indexPosArray = 0; indexPosArray < posArray.length; indexPosArray++) {
+        fillPosArray(sideIdx, sideIdx == 0 ? astsToCidsChannels : cidsToAstsChannels);
+    }
+
+    private void fillPosArray(int sideIdx, ArrayList<Discrete> arrayList) {
+        boolean tempFlag = false;
+        int posArrayIdx = 0;
+        if (sideIdx == 1) posArrayIdx = 1;
+        posArrays[posArrayIdx] = new int[arrayList.get(arrayList.size() - 1).getDiscreteIdx() + 1];//FIXME possible bug the discrete idx´s need to start iwth zero!
+        for (int indexPosArray = 0; indexPosArray < posArrays[posArrayIdx].length; indexPosArray++) {
             for (int index = 0; index < arrayList.size(); index++) {
                 if (indexPosArray == arrayList.get(index).getDiscreteIdx()) {
-                    posArray[indexPosArray] = index;
+                    posArrays[posArrayIdx][indexPosArray] = index;
                     tempFlag = true;
                 }
             }
             if (!tempFlag) {
-                posArray[indexPosArray] = -1;
+                posArrays[posArrayIdx][indexPosArray] = -1;
             }
         }
     }
