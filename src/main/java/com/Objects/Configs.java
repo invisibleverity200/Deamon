@@ -3,11 +3,11 @@ package com.Objects;
 import java.util.ArrayList;
 
 public interface Configs {
-    ArrayList<Discrete> getUpLinkChannels();
+    ArrayList<Discrete> getAstsToCidsChannels();
 
     void updateConfig();
 
-    ArrayList<Discrete> getDownLinkChannels();
-     int[] getDownLinkPosArray();
-     int[] getUpLinkPosArray();
+    ArrayList<Discrete> getCidsToAstsChannels();
+     int[] getCidsToAstsArray();
+     int[] getAstsToCidsArray();
 }

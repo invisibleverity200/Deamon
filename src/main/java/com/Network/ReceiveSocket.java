@@ -45,7 +45,7 @@ public class ReceiveSocket extends Socket {
     }
 
     //[inOrOut,idx,flag]
-    boolean receive(JButton[] upLinkButtons, JButton[] downLinkButtons, int[] posArrayDownLink, int[] posArrayUpLink) throws IOException {
+    boolean receive(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, int[] posArrayCidsToAsts, int[] posArrayAstsToCids) throws IOException {
         try {
             outputStream.write(1);
         } catch (IOException e) {
@@ -58,17 +58,19 @@ public class ReceiveSocket extends Socket {
                     int idx = dataInputStream.readInt();
                     boolean flag = dataInputStream.readBoolean();
                     if (flag) {
-                        downLinkButtons[posArrayDownLink[idx]].setBackground(Color.GREEN);
+                        cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.GREEN);
                     } else {
-                        downLinkButtons[posArrayDownLink[idx]].setBackground(Color.orange);
+                        cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.orange);
                     }
                 } else {
                     int idx = dataInputStream.readInt();
                     boolean flag = dataInputStream.readBoolean();
                     if (flag) {
-                        upLinkButtons[posArrayUpLink[idx]].setBackground(Color.GREEN);
+                        int tempIdx = posArrayAstsToCids[idx];
+                        if (tempIdx != -1) astsToCidsButtons[tempIdx].setBackground(Color.GREEN);
                     } else {
-                        upLinkButtons[posArrayUpLink[idx]].setBackground(Color.orange);
+                        int tempIdx = posArrayAstsToCids[idx];
+                        if (tempIdx != -1) astsToCidsButtons[posArrayAstsToCids[idx]].setBackground(Color.orange);
                     }
                 }
             }

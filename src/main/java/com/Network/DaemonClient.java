@@ -8,8 +8,8 @@ import java.awt.*;
 import java.io.IOException;
 
 public class DaemonClient implements Client {
-    private JButton[] upLinkButtons;
-    private JButton[] downLinkButtons;
+    private JButton[] astsToCidsButtons;
+    private JButton[] cidsToAstsButtons;
     private ReceiveSocket receiveSocket;
     private SendSocket sendSocket;
     private Configs config;
@@ -20,9 +20,9 @@ public class DaemonClient implements Client {
 
 
     //[inOrOut,idx,flag]
-    public DaemonClient(JButton[] upLinkButtons, JButton[] downLinkButtons, Configs config, JLabel statusLabel) throws IOException {
-        this.upLinkButtons = upLinkButtons;
-        this.downLinkButtons = downLinkButtons;
+    public DaemonClient(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, Configs config, JLabel statusLabel) throws IOException {
+        this.astsToCidsButtons = astsToCidsButtons;
+        this.cidsToAstsButtons = cidsToAstsButtons;
         this.config = config;
 
         receiveSocket = new ReceiveSocket(IP_ADDR, RECEIVE_PORT);
@@ -37,7 +37,7 @@ public class DaemonClient implements Client {
     public void run() {
         if (receiveSocket != null) {
             try {
-                receiveSocket.receive(upLinkButtons, downLinkButtons, config.getDownLinkPosArray(), config.getUpLinkPosArray());
+                receiveSocket.receive(astsToCidsButtons, cidsToAstsButtons, config.getCidsToAstsArray(), config.getAstsToCidsArray());
             } catch (IOException e) {
                 e.printStackTrace();
             }

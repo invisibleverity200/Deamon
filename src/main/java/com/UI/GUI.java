@@ -21,41 +21,41 @@ public class GUI extends JFrame {
 
     public GUI() {
         config = new Config();
-        final JButton[][] buttonsUpLink = {null};
-        final JButton[][] buttonsDownLink = {null};
+        final JButton[][] buttonsAstsToCids = {null};
+        final JButton[][] buttonsCidsToAsts = {null};
         AtomicInteger currentSide = new AtomicInteger();
 
-        buttonsUpLink[0] = getUpLinkButtons(config.getUpLinkChannels());
-        buttonsDownLink[0] = getUpLinkButtons(config.getDownLinkChannels());
+        buttonsAstsToCids[0] = getAstsToCids(config.getAstsToCidsChannels());
+        buttonsCidsToAsts[0] = getCidsToAsts(config.getCidsToAstsChannels());
 
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new GridLayout(0, 10));
 
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu channelNameTypes = new JMenu("Channel Names");
+        JMenu channelNameTypes = new JMenu("Sides");
 
         menuBar.add(channelNameTypes);
 
-        JMenuItem upLinkWindow = new JMenuItem("Up Link");
-        JMenuItem downLinkWindow = new JMenuItem("Down Link");
+        JMenuItem AstsToCidsWindow = new JMenuItem("AstsToCids");
+        JMenuItem CidsToAstsWindow = new JMenuItem("CidsToAsts");
 
-        upLinkWindow.addActionListener((ActionEvent e) -> {
+        AstsToCidsWindow.addActionListener((ActionEvent e) -> {
             currentSide.set(0);
-            if (buttonsUpLink[0] == null) {
-                buttonsUpLink[0] = getUpLinkButtons(config.getUpLinkChannels());
-                setUpContentPane(buttonsUpLink[0], contentPanel);
+            if (buttonsAstsToCids[0] == null) {
+                buttonsAstsToCids[0] = getAstsToCids(config.getAstsToCidsChannels());
+                setUpContentPane(buttonsAstsToCids[0], contentPanel);
             } else {
-                setUpContentPane(buttonsUpLink[0], contentPanel);
+                setUpContentPane(buttonsAstsToCids[0], contentPanel);
             }
         });
-        downLinkWindow.addActionListener((ActionEvent e) -> {
+        CidsToAstsWindow.addActionListener((ActionEvent e) -> {
             currentSide.set(1);
-            if (buttonsDownLink[0] == null) {
-                buttonsDownLink[0] = getDownLinkButtons(config.getDownLinkChannels());
-                setUpContentPane(buttonsDownLink[0], contentPanel);
+            if (buttonsCidsToAsts[0] == null) {
+                buttonsCidsToAsts[0] = getCidsToAsts(config.getCidsToAstsChannels());
+                setUpContentPane(buttonsCidsToAsts[0], contentPanel);
             } else {
-                setUpContentPane(buttonsDownLink[0], contentPanel);
+                setUpContentPane(buttonsCidsToAsts[0], contentPanel);
             }
         });
 
@@ -63,13 +63,21 @@ public class GUI extends JFrame {
         JMenu nameSets = new JMenu("Name Sets");
 
         JMenuItem nameSet1 = new JMenuItem("Name set 1");
-        nameSet1.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 0, currentSide.get()));
+        nameSet1.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsAstsToCids[0] : buttonsCidsToAsts[0], 0, currentSide.get()));
 
         JMenuItem nameSet2 = new JMenuItem("Name set 2");
-        nameSet2.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 1, currentSide.get()));
+        nameSet2.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsAstsToCids[0] : buttonsCidsToAsts[0], 1, currentSide.get()));
 
         JMenuItem nameSet3 = new JMenuItem("Name set 3");
-        nameSet3.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsUpLink[0] : buttonsDownLink[0], 2, currentSide.get()));
+        nameSet3.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsAstsToCids[0] : buttonsCidsToAsts[0], 2, currentSide.get()));
+
+        JMenuItem reload = new JMenuItem("Reload");
+        reload.addActionListener((ActionEvent e) -> {
+            config.updateConfig();
+            buttonsAstsToCids[0] = getAstsToCids(config.getAstsToCidsChannels());
+            buttonsCidsToAsts[0] = getCidsToAsts(config.getCidsToAstsChannels());
+            setUpContentPane(currentSide.get() == 0 ? buttonsAstsToCids[0] : buttonsCidsToAsts[0], contentPanel);
+        });
 
         JMenuItem quit = new JMenuItem("Quit");
         quit.addActionListener((ActionEvent e) -> {
@@ -82,6 +90,8 @@ public class GUI extends JFrame {
         nameSets.add(nameSet2);
         nameSets.add(nameSet3);
 
+        operations.add(reload);
+
         operations.add(quit);
 
         JLabel statusLabel = new JLabel("       Not Connected");
@@ -91,8 +101,8 @@ public class GUI extends JFrame {
         menuBar.add(operations);
         menuBar.add(statusLabel);
 
-        channelNameTypes.add(upLinkWindow);
-        channelNameTypes.add(downLinkWindow);
+        channelNameTypes.add(AstsToCidsWindow);
+        channelNameTypes.add(CidsToAstsWindow);
 
         setContentPane(contentPanel);
 
@@ -104,11 +114,11 @@ public class GUI extends JFrame {
 
         setVisible(true);
 
-        setUpContentPane(buttonsUpLink[0], contentPanel);
+        setUpContentPane(buttonsAstsToCids[0], contentPanel);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        while (createClient(buttonsUpLink, buttonsDownLink, true, statusLabel)) ;
+        while (createClient(buttonsAstsToCids, buttonsCidsToAsts, true, statusLabel)) ;
 
     }
 
@@ -137,23 +147,27 @@ public class GUI extends JFrame {
         return true;
     }
 
-    private JButton[] getUpLinkButtons(ArrayList<Discrete> discretes) {
+    private JButton[] getAstsToCids(ArrayList<Discrete> discretes) {
         int i = 0;
         JButton[] buttons = new JButton[discretes.size()];
         int index = 0;
         for (Discrete discrete : discretes) {
             buttons[index] = new JButton(discrete.getAttributes()[nameType].substring(1, discrete.getAttributes()[nameType].length() - 1));
-            buttons[index].setBackground(Color.ORANGE);
+            if (discrete.getAttributes()[discrete.getAttributes().length - 1].substring(1, discrete.getAttributes().length).equals("true")) {
+                buttons[index].setBackground(Color.ORANGE);
+            } else {
+                buttons[index].setBackground(Color.RED);
+            }
             buttons[index].setPreferredSize(new Dimension(150, 40));
             int finalI = i;
             buttons[index].addActionListener((ActionEvent e) -> {
                 int x = finalI;
-                if (config.getUpLinkChannels().get(x).getFlag()) {
-                    config.getUpLinkChannels().get(x).setFlag(false);
+                if (config.getAstsToCidsChannels().get(x).getFlag()) {
+                    config.getAstsToCidsChannels().get(x).setFlag(false);
                 } else {
-                    config.getUpLinkChannels().get(x).setFlag(true);
+                    config.getAstsToCidsChannels().get(x).setFlag(true);
                 }
-                Discrete thisButton = config.getUpLinkChannels().get(x);
+                Discrete thisButton = config.getAstsToCidsChannels().get(x);
                 if (thisButton.getFlag()) {
                     thisButton.setFlag(false);
                 } else {
@@ -168,29 +182,18 @@ public class GUI extends JFrame {
         return buttons;
     }
 
-    private JButton[] getDownLinkButtons(ArrayList<Discrete> discretes) {
+    private JButton[] getCidsToAsts(ArrayList<Discrete> discretes) {
         int i = 0;
         JButton[] buttons = new JButton[discretes.size()];
         int index = 0;
         for (Discrete discrete : discretes) {
             buttons[index] = new JButton(discrete.getAttributes()[nameType].substring(1, discrete.getAttributes()[nameType].length() - 1));
-            buttons[index].setBackground(Color.ORANGE);
+            if (discrete.getAttributes()[discrete.getAttributes().length - 1].substring(1, discrete.getAttributes().length).equals("true")) {
+                buttons[index].setBackground(Color.ORANGE);
+            } else {
+                buttons[index].setBackground(Color.RED);
+            }
             int finalI = i;
-            buttons[index].addActionListener((ActionEvent e) -> {
-                int x = finalI;
-                if (config.getDownLinkChannels().get(x).getFlag()) {
-                    config.getDownLinkChannels().get(x).setFlag(false);
-                } else {
-                    config.getDownLinkChannels().get(x).setFlag(true);
-                }
-                Discrete thisButton = config.getDownLinkChannels().get(x);
-                if (thisButton.getFlag()) {
-                    thisButton.setFlag(false);
-                } else {
-                    thisButton.setFlag(true);
-                }
-                daemonClient.sendDiscrete(thisButton);
-            });
             i++;
             index++;
         }
@@ -221,11 +224,11 @@ public class GUI extends JFrame {
     private void changeNameSet(JButton[] buttons, int nameSetId, int sideIdx) {
         if (sideIdx == 0) {
             for (int index = 0; index < buttons.length; index++) {
-                buttons[index].setText(config.getUpLinkChannels().get(index).getAttributes()[nameSetId + 1].substring(1, config.getUpLinkChannels().get(index).getAttributes()[nameSetId + 1].length() - 1));
+                buttons[index].setText(config.getAstsToCidsChannels().get(index).getAttributes()[nameSetId + 1].substring(1, config.getAstsToCidsChannels().get(index).getAttributes()[nameSetId + 1].length() - 1));
             }
         } else {
             for (int index = 0; index < buttons.length; index++) {
-                buttons[index].setText(config.getDownLinkChannels().get(index).getAttributes()[nameSetId + 1].substring(1, config.getDownLinkChannels().get(index).getAttributes()[nameSetId + 1].length() - 1));
+                buttons[index].setText(config.getCidsToAstsChannels().get(index).getAttributes()[nameSetId + 1].substring(1, config.getCidsToAstsChannels().get(index).getAttributes()[nameSetId + 1].length() - 1));
             }
         }
     }

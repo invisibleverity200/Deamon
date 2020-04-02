@@ -9,34 +9,34 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class Config implements Configs {
-    private ArrayList<Discrete> upLinkChannels = new ArrayList<>(); //Discrete
-    private ArrayList<Discrete> downLinkChannels = new ArrayList<>();
-    private int[] upLinkPosArray;
-    private int[] downLinkPosArray;
+    private ArrayList<Discrete> astsToCidsChannels = new ArrayList<>(); //Discrete
+    private ArrayList<Discrete> cidsToAstsChannels = new ArrayList<>();
+    private int[] astsToCidsArray;
+    private int[] cidsToAstsArray;
 
     public Config() {
         readConfigFile();
     }
 
-    public ArrayList<Discrete> getUpLinkChannels() {
-        return upLinkChannels;
+    public ArrayList<Discrete> getAstsToCidsChannels() {
+        return astsToCidsChannels;
     }
 
-    public ArrayList<Discrete> getDownLinkChannels() {
-        return downLinkChannels;
+    public ArrayList<Discrete> getCidsToAstsChannels() {
+        return cidsToAstsChannels;
     }
 
-    public int[] getUpLinkPosArray() {
-        return upLinkPosArray;
+    public int[] getAstsToCidsArray() {
+        return astsToCidsArray;
     }
 
-    public int[] getDownLinkPosArray() {
-        return downLinkPosArray;
+    public int[] getCidsToAstsArray() {
+        return cidsToAstsArray;
     }
 
     public void updateConfig() {
-        upLinkChannels = new ArrayList<>();
-        downLinkChannels = new ArrayList<>();
+        astsToCidsChannels = new ArrayList<>();
+        cidsToAstsChannels = new ArrayList<>();
         readConfigFile();
     }
 
@@ -55,8 +55,8 @@ public class Config implements Configs {
             JsonArray downLinkChannels = config.getJsonArray("DownlinkChannels");
 
 
-            fillArray(this.upLinkChannels, upLinkChannels, upLinkPosArray);
-            fillArray(this.downLinkChannels, downLinkChannels, downLinkPosArray);
+            fillArray(this.astsToCidsChannels, upLinkChannels, astsToCidsArray);
+            fillArray(this.cidsToAstsChannels, downLinkChannels, cidsToAstsArray);
 
         } catch (FileNotFoundException | JsonParsingException | NumberFormatException | NullPointerException e) {
             e.printStackTrace();
@@ -69,13 +69,13 @@ public class Config implements Configs {
         }
     }
 
-    private void fillArray(ArrayList<Discrete> arrayList, JsonArray channels, int[] posArray) {
+    private void fillArray(ArrayList<Discrete> arrayList, JsonArray channels, int[] posArray) {//FIXME something is wrong here
         boolean tempFlag = false;
         SortAlgorithim algorithim = new MySortAlgorithim();
         for (JsonValue channel : channels) {
             JsonArray temp = channel.asJsonArray();
             int index = 0;
-            String[] channelAttributes = new String[4];
+            String[] channelAttributes = new String[5];
             for (JsonValue channelAttribute : temp) {
                 channelAttributes[index] = channelAttribute.toString();
                 index++;
@@ -90,7 +90,7 @@ public class Config implements Configs {
         posArray = new int[arrayList.get(arrayList.size() - 1).getDiscreteIdx()];
         for (int indexPosArray = 0; indexPosArray < posArray.length; indexPosArray++) {
             for (int index = 0; index < arrayList.size(); index++) {
-                if (index == arrayList.get(index).getDiscreteIdx()) {
+                if (indexPosArray == arrayList.get(index).getDiscreteIdx()) {
                     posArray[indexPosArray] = index;
                     tempFlag = true;
                 }
