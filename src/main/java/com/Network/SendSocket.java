@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class SendSocket extends Socket {
     private String ipAddr;
@@ -22,13 +23,9 @@ public class SendSocket extends Socket {
         init();
     }
 
-    void send(Discrete discrete) {
-        try {
+    void send(Discrete discrete) throws IOException {
             outputStream.writeInt(discrete.getDiscreteIdx());// there is the possibility that u need to send the Id(0A0C)
             outputStream.writeBoolean(discrete.getFlag());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private boolean init() throws IOException {

@@ -9,6 +9,7 @@ import com.Objects.Discrete;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,11 +19,12 @@ public class GUI extends JFrame {
     private Configs config;
     private Client daemonClient;
     private Thread clientThread;
+    private JLabel statusLabel;
+    private final JButton[][] buttonsAstsToCids = {null};
+    private final JButton[][] buttonsCidsToAsts = {null};
 
     public GUI() {
         config = new Config();
-        final JButton[][] buttonsAstsToCids = {null};
-        final JButton[][] buttonsCidsToAsts = {null};
         AtomicInteger currentSide = new AtomicInteger();
 
         buttonsAstsToCids[0] = getAstsToCids(config.getAstsToCidsChannels());
@@ -62,14 +64,24 @@ public class GUI extends JFrame {
         JMenu operations = new JMenu("Operations");
         JMenu nameSets = new JMenu("Name Sets");
 
-        JMenuItem nameSet1 = new JMenuItem("Name set 1");
-        nameSet1.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsAstsToCids[0] : buttonsCidsToAsts[0], 0, currentSide.get()));
+        JMenuItem nameSet1 = new JMenuItem("Name set 1"); //i don´t like  this layout thb
+        nameSet1.addActionListener((ActionEvent e) -> changeNameSet(
+                currentSide.get() == 0 ? buttonsAstsToCids[0] : buttonsCidsToAsts[0],
+                0,
+                currentSide.get()
+                )
+        );
 
         JMenuItem nameSet2 = new JMenuItem("Name set 2");
         nameSet2.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsAstsToCids[0] : buttonsCidsToAsts[0], 1, currentSide.get()));
 
         JMenuItem nameSet3 = new JMenuItem("Name set 3");
         nameSet3.addActionListener((ActionEvent e) -> changeNameSet(currentSide.get() == 0 ? buttonsAstsToCids[0] : buttonsCidsToAsts[0], 2, currentSide.get()));
+
+        JMenuItem reconnect = new JMenuItem("Reconnect");
+        reconnect.addActionListener((ActionEvent e) -> {
+            while (createClient(buttonsAstsToCids, buttonsCidsToAsts, false, statusLabel)) ;
+        });
 
         JMenuItem reload = new JMenuItem("Reload");
         reload.addActionListener((ActionEvent e) -> {
@@ -90,12 +102,12 @@ public class GUI extends JFrame {
         nameSets.add(nameSet2);
         nameSets.add(nameSet3);
 
+        operations.add(reconnect);
         operations.add(reload);
-
         operations.add(quit);
 
-        JLabel statusLabel = new JLabel("       Not Connected");
-        statusLabel.setForeground(Color.red);
+        statusLabel = new JLabel("Disconnected");
+        statusLabel.setForeground(Color.RED);
 
         menuBar.add(nameSets);
         menuBar.add(operations);
@@ -118,7 +130,7 @@ public class GUI extends JFrame {
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        while (createClient(buttonsAstsToCids, buttonsCidsToAsts, true, statusLabel)) ;
+        while (createClient(buttonsAstsToCids, buttonsCidsToAsts, false, statusLabel)) ;
 
     }
 
@@ -129,6 +141,8 @@ public class GUI extends JFrame {
             int returnVal = JOptionPane.showConfirmDialog(null,
                     "Cant Connect to Server pls try again\nretry?", "An Error occurred",
                     JOptionPane.YES_NO_OPTION);
+            statusLabel.setText("Disconnected");
+            statusLabel.setForeground(Color.red);
             if (returnVal == JOptionPane.YES_OPTION) {
                 return true;
             } else {
@@ -144,7 +158,7 @@ public class GUI extends JFrame {
                     JOptionPane.WARNING_MESSAGE);
             return false;
         }
-        return true;
+        return false;
     }
 
     private JButton[] getAstsToCids(ArrayList<Discrete> discretes) {
@@ -173,7 +187,12 @@ public class GUI extends JFrame {
                 } else {
                     thisButton.setFlag(true);
                 }
-                daemonClient.sendDiscrete(thisButton);
+                if (daemonClient != null) {
+                    if (!daemonClient.sendDiscrete(thisButton)) {
+                        statusLabel.setText("Disconnected");
+                        statusLabel.setForeground(Color.red);
+                    }
+                }
             });
             i++;
             index++;

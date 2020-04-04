@@ -43,6 +43,7 @@ public class ReceiveSocket extends Socket {
 
     //[inOrOut,idx,flag]
     boolean receive(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, int[] posArrayCidsToAsts, int[] posArrayAstsToCids) throws IOException {
+        long tempTime = System.currentTimeMillis() + 1000;
         try {
             outputStream.write(1);
         } catch (IOException e) {
@@ -51,7 +52,8 @@ public class ReceiveSocket extends Socket {
         }
         while (true) { //TODO write method
             if (dataInputStream.available() >= Integer.BYTES * 3) {//FIXME possible bug
-                if (dataInputStream.readInt() == 1) {
+                int SideIdx = dataInputStream.readInt();
+                if (SideIdx == 1) {
                     int idx = dataInputStream.readInt();
                     boolean flag = dataInputStream.readBoolean();
                     if (flag) {
@@ -59,7 +61,7 @@ public class ReceiveSocket extends Socket {
                     } else {
                         cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.orange);
                     }
-                } else {
+                } else if (SideIdx == 0) {
                     int idx = dataInputStream.readInt();
                     boolean flag = dataInputStream.readBoolean();
                     if (flag) {
@@ -69,7 +71,14 @@ public class ReceiveSocket extends Socket {
                         int tempIdx = posArrayAstsToCids[idx];
                         if (tempIdx != -1) astsToCidsButtons[posArrayAstsToCids[idx]].setBackground(Color.orange);
                     }
+                } else {
+                    tempTime = System.currentTimeMillis();
+                    dataInputStream.readInt();
+                    dataInputStream.readBoolean();
                 }
+            }
+            if (System.currentTimeMillis() - tempTime > 4000) {
+                return false;
             }
         }
     }

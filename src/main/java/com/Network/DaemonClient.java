@@ -6,6 +6,7 @@ import com.Objects.Discrete;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.net.SocketException;
 
 public class DaemonClient implements Client {
     private JButton[] astsToCidsButtons;
@@ -13,10 +14,11 @@ public class DaemonClient implements Client {
     private ReceiveSocket receiveSocket;
     private SendSocket sendSocket;
     private Configs config;
+    private JLabel statusLabel;
 
-    private static String IP_ADDR = "192.168.1.204";
-    private static int RECEIVE_PORT = 31242;
-    private static int SEND_PORT = 1272;
+    private static String IP_ADDR = "192.168.1.109";
+    private static int RECEIVE_PORT = 2342;
+    private static int SEND_PORT = 4233;
 
 
     //[inOrOut,idx,flag]
@@ -28,6 +30,8 @@ public class DaemonClient implements Client {
         receiveSocket = new ReceiveSocket(IP_ADDR, RECEIVE_PORT);
         sendSocket = new SendSocket(IP_ADDR, SEND_PORT);
 
+        this.statusLabel = statusLabel;
+
         statusLabel.setText("Connected");
         statusLabel.setForeground(Color.GREEN);
 
@@ -37,7 +41,10 @@ public class DaemonClient implements Client {
     public void run() {
         if (receiveSocket != null) {
             try {
-                receiveSocket.receive(astsToCidsButtons, cidsToAstsButtons, config.getCidsToAstsArray(), config.getAstsToCidsArray());
+                if (!receiveSocket.receive(astsToCidsButtons, cidsToAstsButtons, config.getCidsToAstsArray(), config.getAstsToCidsArray())) {
+                    statusLabel.setText("Disconnected");
+                    statusLabel.setForeground(Color.red);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -45,7 +52,14 @@ public class DaemonClient implements Client {
     }
 
     public boolean sendDiscrete(Discrete discrete) {
-        sendSocket.send(discrete);
+
+        try {
+            sendSocket.send(discrete);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
         return true;
     }
 
