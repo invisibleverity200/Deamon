@@ -8,6 +8,8 @@ public interface Configs {
     void updateConfig();
 
     ArrayList<Discrete> getCidsToAstsChannels();
-     int[] getCidsToAstsArray();
-     int[] getAstsToCidsArray();
+
+    int[] getCidsToAstsArray();
+
+    int[] getAstsToCidsArray();
 }

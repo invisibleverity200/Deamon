@@ -9,7 +9,6 @@ import com.Objects.Discrete;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -80,6 +79,8 @@ public class GUI extends JFrame {
 
         JMenuItem reconnect = new JMenuItem("Reconnect");
         reconnect.addActionListener((ActionEvent e) -> {
+            if (daemonClient != null) daemonClient.closeConnections();
+            if (clientThread != null) clientThread.stop();
             while (createClient(buttonsAstsToCids, buttonsCidsToAsts, false, statusLabel)) ;
         });
 
@@ -153,9 +154,6 @@ public class GUI extends JFrame {
         if (!failed) {//FIXME possible bug!!!
             clientThread = new Thread(daemonClient);
             clientThread.start();
-            JOptionPane.showMessageDialog(null,
-                    "Connected to Server", "An Error occurred",
-                    JOptionPane.WARNING_MESSAGE);
             return false;
         }
         return false;
@@ -191,6 +189,7 @@ public class GUI extends JFrame {
                     if (!daemonClient.sendDiscrete(thisButton)) {
                         statusLabel.setText("Disconnected");
                         statusLabel.setForeground(Color.red);
+                        daemonClient.closeConnections();
                     }
                 }
             });
@@ -216,7 +215,6 @@ public class GUI extends JFrame {
             i++;
             index++;
         }
-
         return buttons;
     }
 

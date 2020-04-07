@@ -16,7 +16,7 @@ public class DaemonClient implements Client {
     private Configs config;
     private JLabel statusLabel;
 
-    private static String IP_ADDR = "192.168.1.109";
+    private static String IP_ADDR = "192.168.1.113";
     private static int RECEIVE_PORT = 2342;
     private static int SEND_PORT = 4233;
 
@@ -47,6 +47,8 @@ public class DaemonClient implements Client {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            }finally {
+                closeConnections();
             }
         }
     }

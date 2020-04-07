@@ -46,40 +46,42 @@ public class ReceiveSocket extends Socket {
         long tempTime = System.currentTimeMillis() + 1000;
         try {
             outputStream.write(1);
+
+
+            while (true) { //TODO write method
+                if (dataInputStream.available() >= (Integer.BYTES * 2 + Character.BYTES)) {//FIXME possible bug
+                    int SideIdx = dataInputStream.readInt();
+                    if (SideIdx == 1) {
+                        int idx = dataInputStream.readInt();
+                        boolean flag = dataInputStream.readBoolean();
+                        if (flag) {
+                            cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.GREEN);
+                        } else {
+                            cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.orange);
+                        }
+                    } else if (SideIdx == 0) {
+                        int idx = dataInputStream.readInt();
+                        boolean flag = dataInputStream.readBoolean();
+                        if (flag) {
+                            int tempIdx = posArrayAstsToCids[idx];
+                            if (tempIdx != -1) astsToCidsButtons[tempIdx].setBackground(Color.GREEN);
+                        } else {
+                            int tempIdx = posArrayAstsToCids[idx];
+                            if (tempIdx != -1) astsToCidsButtons[posArrayAstsToCids[idx]].setBackground(Color.orange);
+                        }
+                    } else {
+                        tempTime = System.currentTimeMillis();
+                        dataInputStream.readInt();
+                        dataInputStream.readBoolean();
+                    }
+                }
+                if (System.currentTimeMillis() - tempTime > 4000) {
+                    return false;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }
-        while (true) { //TODO write method
-            if (dataInputStream.available() >= Integer.BYTES * 3) {//FIXME possible bug
-                int SideIdx = dataInputStream.readInt();
-                if (SideIdx == 1) {
-                    int idx = dataInputStream.readInt();
-                    boolean flag = dataInputStream.readBoolean();
-                    if (flag) {
-                        cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.GREEN);
-                    } else {
-                        cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.orange);
-                    }
-                } else if (SideIdx == 0) {
-                    int idx = dataInputStream.readInt();
-                    boolean flag = dataInputStream.readBoolean();
-                    if (flag) {
-                        int tempIdx = posArrayAstsToCids[idx];
-                        if (tempIdx != -1) astsToCidsButtons[tempIdx].setBackground(Color.GREEN);
-                    } else {
-                        int tempIdx = posArrayAstsToCids[idx];
-                        if (tempIdx != -1) astsToCidsButtons[posArrayAstsToCids[idx]].setBackground(Color.orange);
-                    }
-                } else {
-                    tempTime = System.currentTimeMillis();
-                    dataInputStream.readInt();
-                    dataInputStream.readBoolean();
-                }
-            }
-            if (System.currentTimeMillis() - tempTime > 4000) {
-                return false;
-            }
         }
     }
 }
