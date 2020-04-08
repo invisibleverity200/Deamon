@@ -1,11 +1,14 @@
 package com.Network;
 
+import com.Objects.Discrete;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ReceiveSocket extends Socket {
     private String ipAddr;
@@ -42,37 +45,45 @@ public class ReceiveSocket extends Socket {
     }
 
     //[inOrOut,idx,flag]
-    boolean receive(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, int[] posArrayCidsToAsts, int[] posArrayAstsToCids) throws IOException {
+    boolean receive(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, int[] posArrayCidsToAsts, int[] posArrayAstsToCids, ArrayList<Discrete> discretes) throws IOException {
         long tempTime = System.currentTimeMillis() + 1000;
         try {
             outputStream.write(1);
 
 
             while (true) { //TODO write method
-                if (dataInputStream.available() >= (Integer.BYTES * 2 + Character.BYTES)) {//FIXME possible bug
+                if (dataInputStream.available() >= (Integer.BYTES * 3)) {//FIXME possible bug
                     int SideIdx = dataInputStream.readInt();
                     if (SideIdx == 1) {
                         int idx = dataInputStream.readInt();
-                        boolean flag = dataInputStream.readBoolean();
-                        if (flag) {
-                            cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.GREEN);
+                        int flag = dataInputStream.readInt();
+                        if (flag == 1) {
+                            int tempIdx = posArrayCidsToAsts[idx];
+                            if (tempIdx != -1) cidsToAstsButtons[tempIdx].setBackground(Color.GREEN);
                         } else {
-                            cidsToAstsButtons[posArrayCidsToAsts[idx]].setBackground(Color.orange);
+                            int tempIdx = posArrayCidsToAsts[idx];
+                            if (tempIdx != -1) cidsToAstsButtons[tempIdx].setBackground(Color.orange);
                         }
                     } else if (SideIdx == 0) {
                         int idx = dataInputStream.readInt();
-                        boolean flag = dataInputStream.readBoolean();
-                        if (flag) {
+                        int flag = dataInputStream.readInt();
+                        if (flag == 1) {
                             int tempIdx = posArrayAstsToCids[idx];
-                            if (tempIdx != -1) astsToCidsButtons[tempIdx].setBackground(Color.GREEN);
+                            if (tempIdx != -1) {
+                                astsToCidsButtons[tempIdx].setBackground(Color.GREEN);
+                                discretes.get(tempIdx).setFlag(true);
+                            }
                         } else {
                             int tempIdx = posArrayAstsToCids[idx];
-                            if (tempIdx != -1) astsToCidsButtons[posArrayAstsToCids[idx]].setBackground(Color.orange);
+                            if (tempIdx != -1) {
+                                astsToCidsButtons[tempIdx].setBackground(Color.orange);
+                                discretes.get(tempIdx).setFlag(false);
+                            }
                         }
                     } else {
                         tempTime = System.currentTimeMillis();
                         dataInputStream.readInt();
-                        dataInputStream.readBoolean();
+                        dataInputStream.readInt();
                     }
                 }
                 if (System.currentTimeMillis() - tempTime > 4000) {

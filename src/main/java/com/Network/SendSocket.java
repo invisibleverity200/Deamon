@@ -24,8 +24,8 @@ public class SendSocket extends Socket {
 
     void send(Discrete discrete) throws IOException {
         outputStream.writeInt(discrete.getDiscreteIdx());// there is the possibility that u need to send the Id(0A0C)
-        System.out.println(discrete.getDiscreteIdx());
-        outputStream.writeBoolean(discrete.getFlag());
+        System.out.println(discrete.getDiscreteIdx() + "Size: " + Integer.BYTES);
+        outputStream.writeBoolean(!discrete.getFlag());
         System.out.println(discrete.getFlag());
     }
 

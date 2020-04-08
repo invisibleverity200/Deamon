@@ -41,7 +41,7 @@ public class DaemonClient implements Client {
     public void run() {
         if (receiveSocket != null) {
             try {
-                if (!receiveSocket.receive(astsToCidsButtons, cidsToAstsButtons, config.getCidsToAstsArray(), config.getAstsToCidsArray())) {
+                if (!receiveSocket.receive(astsToCidsButtons, cidsToAstsButtons, config.getCidsToAstsArray(), config.getAstsToCidsArray(),config.getAstsToCidsChannels())) {
                     statusLabel.setText("Disconnected");
                     statusLabel.setForeground(Color.red);
                 }
