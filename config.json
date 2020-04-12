@@ -1,1 +1,1 @@
-{"UplinkChannels":[["0B04","test","test2","test3","false"],["1C012","test","test2","test3","true"],["1C012","test","test2","test3","true"]],"DownlinkChannels":[["1C012","test","test2","test3","true"]]}
+{"Ip":"192.168.1.108","UplinkChannels":[["0B04","test","test2","test3","false"],["1C012","test","test2","test3","true"],["1C012","test","test2","test3","true"]],"DownlinkChannels":[["1C012","test","test2","test3","true"]]}

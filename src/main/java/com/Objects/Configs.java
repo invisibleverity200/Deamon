@@ -12,4 +12,6 @@ public interface Configs {
     int[] getCidsToAstsArray();
 
     int[] getAstsToCidsArray();
+
+    String getIp();
 }

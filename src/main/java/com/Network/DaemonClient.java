@@ -6,7 +6,6 @@ import com.Objects.Discrete;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.net.SocketException;
 
 public class DaemonClient implements Client {
     private JButton[] astsToCidsButtons;
@@ -15,20 +14,21 @@ public class DaemonClient implements Client {
     private SendSocket sendSocket;
     private Configs config;
     private JLabel statusLabel;
+    private String ip;
 
-    private static String IP_ADDR = "192.168.1.113";
     private static int RECEIVE_PORT = 2342;
     private static int SEND_PORT = 4233;
 
 
     //[inOrOut,idx,flag]
-    public DaemonClient(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, Configs config, JLabel statusLabel) throws IOException {
+    public DaemonClient(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, Configs config, JLabel statusLabel, String ip) throws IOException {
         this.astsToCidsButtons = astsToCidsButtons;
         this.cidsToAstsButtons = cidsToAstsButtons;
         this.config = config;
+        this.ip = ip;
 
-        receiveSocket = new ReceiveSocket(IP_ADDR, RECEIVE_PORT);
-        sendSocket = new SendSocket(IP_ADDR, SEND_PORT);
+        receiveSocket = new ReceiveSocket(this.ip, RECEIVE_PORT);
+        sendSocket = new SendSocket(this.ip, SEND_PORT);
 
         this.statusLabel = statusLabel;
 
@@ -40,16 +40,13 @@ public class DaemonClient implements Client {
     @Override
     public void run() {
         if (receiveSocket != null) {
-            try {
-                if (!receiveSocket.receive(astsToCidsButtons, cidsToAstsButtons, config.getCidsToAstsArray(), config.getAstsToCidsArray(),config.getAstsToCidsChannels())) {
-                    statusLabel.setText("Disconnected");
-                    statusLabel.setForeground(Color.red);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }finally {
-                closeConnections();
+
+            if (!receiveSocket.receive(astsToCidsButtons, cidsToAstsButtons, config.getCidsToAstsArray(), config.getAstsToCidsArray(), config.getAstsToCidsChannels())) {
+                statusLabel.setText("Disconnected");
+                statusLabel.setForeground(Color.red);
             }
+            closeConnections();
+
         }
     }
 

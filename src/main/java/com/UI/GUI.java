@@ -137,7 +137,7 @@ public class GUI extends JFrame {
 
     private boolean createClient(JButton[][] buttonsUpLink, JButton[][] buttonsDownLink, boolean failed, JLabel statusLabel) {
         try {
-            daemonClient = new DaemonClient(buttonsUpLink[0], buttonsDownLink[0], config, statusLabel);
+            daemonClient = new DaemonClient(buttonsUpLink[0], buttonsDownLink[0], config, statusLabel, config.getIp());
         } catch (IOException e) {
             int returnVal = JOptionPane.showConfirmDialog(null,
                     "Cant Connect to Server pls try again\nretry?", "An Error occurred",
@@ -201,7 +201,6 @@ public class GUI extends JFrame {
     }
 
     private JButton[] getCidsToAsts(ArrayList<Discrete> discretes) {
-        int i = 0;
         JButton[] buttons = new JButton[discretes.size()];
         int index = 0;
         for (Discrete discrete : discretes) {
@@ -211,8 +210,6 @@ public class GUI extends JFrame {
             } else {
                 buttons[index].setBackground(Color.RED);
             }
-            int finalI = i;
-            i++;
             index++;
         }
         return buttons;

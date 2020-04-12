@@ -10,42 +10,33 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ReceiveSocket extends Socket {
-    private String ipAddr;
-    private int port;
+class ReceiveSocket extends Socket {
     private DataOutputStream outputStream;
     private DataInputStream dataInputStream;
 
     //[inOrOut,idx,flag]
     ReceiveSocket(String ipAddr, int port) throws IOException {
         super(ipAddr, port);
-
-        this.ipAddr = ipAddr;
-        this.port = port;
-
         init();
     }
 
-    private boolean init() throws IOException {
+    private void init() throws IOException {
         try {
             outputStream = new DataOutputStream(this.getOutputStream());
             dataInputStream = new DataInputStream(this.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
             closeConnection();
-            return false;
         }
-        return true;
     }
 
-    public void closeConnection() throws IOException {
-        if (this != null) this.close();
+    void closeConnection() throws IOException {
         if (outputStream != null) outputStream.close();
         if (dataInputStream != null) dataInputStream.close();
     }
 
     //[inOrOut,idx,flag]
-    boolean receive(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, int[] posArrayCidsToAsts, int[] posArrayAstsToCids, ArrayList<Discrete> discretes) throws IOException {
+    boolean receive(JButton[] astsToCidsButtons, JButton[] cidsToAstsButtons, int[] posArrayCidsToAsts, int[] posArrayAstsToCids, ArrayList<Discrete> discretes){
         long tempTime = System.currentTimeMillis() + 1000;
         try {
             outputStream.write(1);

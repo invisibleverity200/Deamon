@@ -12,6 +12,12 @@ public class Config implements Configs {
     private ArrayList<Discrete> astsToCidsChannels = new ArrayList<>(); //Discrete
     private ArrayList<Discrete> cidsToAstsChannels = new ArrayList<>();
     private int[][] posArrays = new int[2][];
+    private String ip;
+
+    public String getIp() {
+        System.out.println("ip: " + ip);
+        return ip;
+    }
 
     public Config() {
         readConfigFile();
@@ -39,6 +45,7 @@ public class Config implements Configs {
         readConfigFile();
     }
 
+    //192.168.1.108
     private void readConfigFile() {
         InputStream inputStream = null;
         JsonReader reader = null;
@@ -52,6 +59,12 @@ public class Config implements Configs {
 
             JsonArray astsToCidsChannels = config.getJsonArray("UplinkChannels");
             JsonArray cidsToAstsChannels = config.getJsonArray("DownlinkChannels");
+            String ip = config.getString("Ip");
+            if (!checkIp(ip)) {
+                System.out.println("Not valid Ip address!");
+            } else {
+                this.ip = ip;
+            }
 
 
             fillArray(this.astsToCidsChannels, astsToCidsChannels, 0);
@@ -113,5 +126,20 @@ public class Config implements Configs {
         if (inputStream2 != null) inputStream2.close();
         if (jsonReader != null) jsonReader.close();
         if (jsonReader2 != null) jsonReader2.close();
+    }
+
+    private boolean checkIp(String ip) {
+        String[] ipParts = ip.split("\\.");
+        if (ipParts.length != 4) {
+            return false;
+        }
+        for (int i = 0; i < ipParts.length; i++) {
+            try {
+                int temp = Integer.parseInt(ipParts[i]);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return true;
     }
 }
